@@ -28,7 +28,6 @@ namespace StructuralModelEngine
         {
             InitializeComponent();
            
-           // AnalyzeTextAsync();
             DBG = "Program started";
 
             var cts = new System.Threading.CancellationTokenSource();
@@ -128,10 +127,6 @@ namespace StructuralModelEngine
             await Task.Run(() => AnalyzeText());
         }
                 
-        void UpdateAllStuff(object sender, EventArgs e)
-        {
-            
-        }
 
         void DebugMsg(string msg)
         {
