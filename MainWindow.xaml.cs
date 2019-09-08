@@ -27,28 +27,32 @@ namespace StructuralModelEngine
         public MainWindow()
         {
             InitializeComponent();
-           
-            DBG = "Program started";
 
-            var cts = new System.Threading.CancellationTokenSource();
-            var ts = cts.Token;
+            DebugMsg("Program started.");
 
-            var analyze = Task.Run(()=> 
+            cts = new CancellationTokenSource();
+            token = cts.Token;
+
+            Task.Run(()=> 
             {
-                LoopAnalyzeText(ts);
-            }, ts);
+               LoopAnalyzeText();
+            }, token);
 
-            System.Threading.Thread.Sleep(5000);
             cts.Cancel();
+            DebugMsg("Cancellation requested.");
+
+            //Освобождаю какие-то ресурсы...
             cts.Dispose();
 
         }
 
+        CancellationTokenSource cts;
+        CancellationToken token;
 
-        Random random = new Random();
         MeshGeometry3D mesh = new MeshGeometry3D();
 
         Model m = new Model();
+        
        
         void AddSphere(double x, double y, double z, double r)
         {
@@ -74,19 +78,15 @@ namespace StructuralModelEngine
 
         void AnalyzeText()
         {
-            DebugMsg("AnalyzeText() поток(" + System.Threading.Thread.CurrentThread.ManagedThreadId + ")");
+            DebugMsg("AnalyzeText() поток(" + Thread.CurrentThread.ManagedThreadId + ")");
+            
             #region Распознаем текст, добавляем узлы
             TextRange doc = new TextRange(textEdit.Document.ContentStart, textEdit.Document.ContentEnd);
             m.nodes.Clear();
 
-            //Dispatcher.Invoke(
-            //    () => { doc.Text = doc.Text.Replace("node", "<Bold>node<Bold>"); });
-            
-
             Dispatcher.Invoke(()=> { model.Children.Clear(); });
             
-
-            var lines = doc.Text.Split("\n".ToCharArray());
+            var lines = doc.Text.Split('\n');
 
             foreach (var l in lines)
             {
@@ -118,16 +118,8 @@ namespace StructuralModelEngine
 
             #endregion
 
-            //System.Threading.Thread.Sleep(5000);
-            //AnalyzeTextAsync();
         }
-
-        async void AnalyzeTextAsync()
-        {
-            await Task.Run(() => AnalyzeText());
-        }
-                
-
+        
         void DebugMsg(string msg)
         {
             TextRange doc = new TextRange(debugOutput.Document.ContentStart, debugOutput.Document.ContentEnd);
@@ -139,14 +131,13 @@ namespace StructuralModelEngine
             
         }
 
-        void LoopAnalyzeText(CancellationToken ts)
+        void LoopAnalyzeText()
         {
             while (true)
             {
-                if (ts.IsCancellationRequested)
+                if (token.IsCancellationRequested)
                 {
-                    // another thread decided to cancel
-                    DebugMsg("task canceled");
+                    DebugMsg("LoopAnalyzeText canceled");
                     break;
                 }
                 AnalyzeText();
@@ -154,19 +145,5 @@ namespace StructuralModelEngine
             }
         }
 
-        public string DBG
-        {
-            get
-            {
-                return new TextRange(debugOutput.Document.ContentStart, debugOutput.Document.ContentEnd).Text;
-            }
-            set
-            {
-                TextRange doc = new TextRange(debugOutput.Document.ContentStart, debugOutput.Document.ContentEnd);
-                doc.Text = value;
-            }
-        }
-
-        
     }
 }
