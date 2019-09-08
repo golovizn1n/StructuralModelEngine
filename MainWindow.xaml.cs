@@ -52,7 +52,6 @@ namespace StructuralModelEngine
         MeshGeometry3D mesh = new MeshGeometry3D();
 
         Model m = new Model();
-        
        
         void AddSphere(double x, double y, double z, double r)
         {
