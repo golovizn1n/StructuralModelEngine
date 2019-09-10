@@ -30,30 +30,14 @@ namespace StructuralModelEngine
 
             DebugMsg("Program started.");
 
-            cts = new CancellationTokenSource();
-            token = cts.Token;
+            TextAnalyzer textAnalyzer = new TextAnalyzer(this);
+            textAnalyzer.Start();
+        } 
 
-            Task.Run(()=> 
-            {
-               LoopAnalyzeText();
-            }, token);
-
-            cts.Cancel();
-            DebugMsg("Cancellation requested.");
-
-            //Освобождаю какие-то ресурсы...
-            cts.Dispose();
-
-        }
-
-        CancellationTokenSource cts;
-        CancellationToken token;
-
-        MeshGeometry3D mesh = new MeshGeometry3D();
-
-        Model m = new Model();
+        public StructuralModel structuralModel = new StructuralModel();
        
-        void AddSphere(double x, double y, double z, double r)
+        
+        public void AddSphere(double x, double y, double z, double r)
         {
             this.Dispatcher.Invoke(() =>
             {
@@ -61,8 +45,10 @@ namespace StructuralModelEngine
                 s.Center = new Point3D(x, y, z);
                 s.Radius = r;
                 s.Material = Materials.Red;
-                model.Children.Add(s);
+                modelVisual3D.Children.Add(s);
             });
+
+            //Этот способ создаст сферу в том же мэше, что возможно ускорит отрисовку
            /* mesh.Positions.Add(new Point3D(x + 5.0, y, z));
             mesh.Positions.Add(new Point3D(x, y + 5.0, z));
             mesh.Positions.Add(new Point3D(x, y, z));
@@ -74,51 +60,8 @@ namespace StructuralModelEngine
             mesh.TriangleIndices.Add(n - 1);*/
 
         }
-
-        void AnalyzeText()
-        {
-            DebugMsg("AnalyzeText() поток(" + Thread.CurrentThread.ManagedThreadId + ")");
-            
-            #region Распознаем текст, добавляем узлы
-            TextRange doc = new TextRange(textEdit.Document.ContentStart, textEdit.Document.ContentEnd);
-            m.nodes.Clear();
-
-            Dispatcher.Invoke(()=> { model.Children.Clear(); });
-            
-            var lines = doc.Text.Split('\n');
-
-            foreach (var l in lines)
-            {
-                var words = l.Split(" ".ToCharArray());
-
-                if (words[0] == "node")
-                {
-                    try
-                    {
-                        var x = Convert.ToSingle(words[1]);
-                        var y = Convert.ToSingle(words[2]);
-                        var z = Convert.ToSingle(words[3]);
-
-                        m.AddNode(x, y, z);
-                    }
-                    catch (Exception)
-                    {
-
-                        //throw;
-                    }
-                }
-            }
-
-            
-            foreach (var n in m.nodes)
-            {
-                AddSphere(n.x, n.y, n.z, 0.2);
-            }
-
-            #endregion
-
-        }
-        
+         
+        //Выводим некторое сообщение в лог
         void DebugMsg(string msg)
         {
             TextRange doc = new TextRange(debugOutput.Document.ContentStart, debugOutput.Document.ContentEnd);
@@ -130,19 +73,6 @@ namespace StructuralModelEngine
             
         }
 
-        void LoopAnalyzeText()
-        {
-            while (true)
-            {
-                if (token.IsCancellationRequested)
-                {
-                    DebugMsg("LoopAnalyzeText canceled");
-                    break;
-                }
-                AnalyzeText();
-                System.Threading.Thread.Sleep(2000);
-            }
-        }
-
+        
     }
 }

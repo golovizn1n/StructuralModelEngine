@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace StructuralModelEngine
 {
-    class Node
+    public class Node
     {
         public Node(int Number)
         {
-            x = 0f;
-            y = 0f;
-            z = 0f;
+            x = 0.0;
+            y = 0.0;
+            z = 0.0;
             number = Number;
         }
 
-        public float x, y, z;
+        public double x, y, z;
         public int number;
     }
 }

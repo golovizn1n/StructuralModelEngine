@@ -24,7 +24,7 @@
             >
             <!-- Remember to add light to the scene -->
             <HelixToolkit:SunLight/>
-            <ModelVisual3D x:Name="model">
+            <ModelVisual3D x:Name="modelVisual3D">
                 <ModelVisual3D.Content>
                     <GeometryModel3D x:Name="model2">
                         <GeometryModel3D.Geometry>

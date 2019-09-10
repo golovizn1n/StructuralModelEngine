@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace StructuralModelEngine
 {
-    class Model
+    public class StructuralModel
     {
         
-        public Model()
+        public StructuralModel()
         {
             nodes = new List<Node>();
         }
