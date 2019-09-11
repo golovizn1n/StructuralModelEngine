@@ -41,8 +41,8 @@ namespace StructuralModelEngine
         {
             #region Распознаем текст, добавляем узлы
             TextRange doc = new TextRange(mainWindow.textEdit.Document.ContentStart, mainWindow.textEdit.Document.ContentEnd);
-            mainWindow.structuralModel.nodes.Clear();
 
+            mainWindow.structuralModel.nodes.Clear();
             mainWindow.Dispatcher.Invoke(() => { mainWindow.modelVisual3D.Children.Clear(); });
 
             var lines = doc.Text.Split('\n');
@@ -73,6 +73,7 @@ namespace StructuralModelEngine
             foreach (var n in mainWindow.structuralModel.nodes)
             {
                 mainWindow.AddSphere(n.x, n.y, n.z, 0.2);
+                mainWindow.AddCs(n.x, n.y, n.z);
             }
 
             #endregion

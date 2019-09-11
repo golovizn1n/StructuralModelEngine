@@ -36,7 +36,6 @@ namespace StructuralModelEngine
 
         public StructuralModel structuralModel = new StructuralModel();
        
-        
         public void AddSphere(double x, double y, double z, double r)
         {
             this.Dispatcher.Invoke(() =>
@@ -46,6 +45,7 @@ namespace StructuralModelEngine
                 s.Radius = r;
                 s.Material = Materials.Red;
                 modelVisual3D.Children.Add(s);
+                
             });
 
             //Этот способ создаст сферу в том же мэше, что возможно ускорит отрисовку
@@ -60,7 +60,17 @@ namespace StructuralModelEngine
             mesh.TriangleIndices.Add(n - 1);*/
 
         }
-         
+
+        public void AddCs(double x, double y, double z)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                var t = new CoordinateSystemVisual3D();
+                t.Transform = new TranslateTransform3D(x, y, z);
+                modelVisual3D.Children.Add(t);
+            });
+        }
+        
         //Выводим некторое сообщение в лог
         void DebugMsg(string msg)
         {

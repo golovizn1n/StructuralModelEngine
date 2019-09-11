@@ -8,12 +8,13 @@ namespace StructuralModelEngine
 {
     public class StructuralModel
     {
-        
+
         public StructuralModel()
         {
             nodes = new List<Node>();
         }
-        public List<Node> nodes;// = new List<Node>();
+
+        public List<Node> nodes;
 
         public Node AddNode(float x, float y, float z)
         {
@@ -23,8 +24,14 @@ namespace StructuralModelEngine
             n.z = z;
 
             nodes.Add(n);
-            return  n;
+            return n;
         }
+
+        public void ToView()
+        {
+            
+        }
+
 
         private int nodeindexer = 0;
         
