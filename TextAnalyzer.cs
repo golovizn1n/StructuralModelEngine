@@ -73,7 +73,14 @@ namespace StructuralModelEngine
             foreach (var n in mainWindow.structuralModel.nodes)
             {
                 mainWindow.AddSphere(n.x, n.y, n.z, 0.2);
-                mainWindow.AddCs(n.x, n.y, n.z);
+                if (n.x < 1.0)
+                {
+                    var n2 = mainWindow.structuralModel.nodes[1];
+
+                    mainWindow.AddCs(new Vector3D(n.x, n.y, n.z), new Vector3D(n2.x, n2.y, n2.z));
+                    
+                }
+                
             }
 
             #endregion
