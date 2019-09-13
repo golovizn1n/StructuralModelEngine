@@ -51,36 +51,38 @@ namespace StructuralModelEngine
             {
                 var words = l.Split(" ".ToCharArray());
 
-                if (words[0] == "node")
+                switch (words[0])
                 {
-                    try
-                    {
-                        var x = Convert.ToSingle(words[1]);
-                        var y = Convert.ToSingle(words[2]);
-                        var z = Convert.ToSingle(words[3]);
+                    case "node":
+                        try
+                        {
+                            var x = Convert.ToSingle(words[1]);
+                            var y = Convert.ToSingle(words[2]);
+                            var z = Convert.ToSingle(words[3]);
 
-                        mainWindow.structuralModel.AddNode(x, y, z);
-                    }
-                    catch (Exception)
-                    {
+                            var n = mainWindow.structuralModel.AddNode(x, y, z);
 
-                        //throw;
-                    }
-                }
+                            if (words[4] == "cs")
+                            {
+                                n.xt = Convert.ToSingle(words[5]);
+                                n.yt = Convert.ToSingle(words[6]);
+                                n.zt = Convert.ToSingle(words[7]);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        break;
+                    default:
+                        break;
+                }                
             }
 
 
             foreach (var n in mainWindow.structuralModel.nodes)
             {
                 mainWindow.AddSphere(n.x, n.y, n.z, 0.2);
-                if (n.x < 1.0)
-                {
-                    var n2 = mainWindow.structuralModel.nodes[1];
-
-                    mainWindow.AddCs(new Vector3D(n.x, n.y, n.z), new Vector3D(n2.x, n2.y, n2.z));
-                    
-                }
-                
+                mainWindow.AddCs(new Vector3D(n.x, n.y, n.z), new Vector3D(n.xt, n.yt, n.zt));                
             }
 
             #endregion

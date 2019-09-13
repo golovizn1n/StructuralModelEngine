@@ -69,7 +69,7 @@ namespace StructuralModelEngine
             {
                 var t = new CoordinateSystemVisual3D();
 
-                //Transform3DGroup tg = new Transform3DGroup();
+               // Transform3DGroup tg = new Transform3DGroup();
                 
                 //tg.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1.0, 0.0, 0.0), 45.0)));
                // tg.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0.0, 1.0, 0.0), 45.0)));
@@ -94,17 +94,12 @@ namespace StructuralModelEngine
                 var t = new CoordinateSystemVisual3D();
                 var cm = BuildCosinesMatrix(x, y, z);
 
-                t.Transform = new MatrixTransform3D(cm);
-
-               // Transform3DGroup tg = new Transform3DGroup();
+               Transform3DGroup tg = new Transform3DGroup();
                 
-                //tg.Children.Add(cm);
+                tg.Children.Add(new MatrixTransform3D(cm));
+                tg.Children.Add(new TranslateTransform3D(position.X, position.Y, position.Z));
 
-               // tg.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1.0, 0.0, 0.0), 45.0)));
-               // tg.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0.0, 1.0, 0.0), 45.0)));
-                //tg.Children.Add(new TranslateTransform3D(position.X, position.Y, position.Z));
-
-               // t.Transform = tg;
+               t.Transform = tg;
                 modelVisual3D.Children.Add(t);
             });
         }
@@ -121,14 +116,17 @@ namespace StructuralModelEngine
             
         }
 
-        static Matrix3D BuildCosinesMatrix(Vector3D x1, Vector3D y1, Vector3D z1)
+        public Matrix3D BuildCosinesMatrix(Vector3D x1, Vector3D y1, Vector3D z1)
         {
             Matrix3D matrix = new Matrix3D();
+
+            x1.Normalize();
+            y1.Normalize();
+            z1.Normalize();            
 
             Vector3D x0 = new Vector3D(1.0, 0.0, 0.0);
             Vector3D y0 = new Vector3D(0.0, 1.0, 0.0);
             Vector3D z0 = new Vector3D(0.0, 0.0, 1.0);
-
             
             matrix.M11 = VecCos(x0, x1);
             matrix.M21 = -VecCos(x0, y1); //-
@@ -142,8 +140,7 @@ namespace StructuralModelEngine
             matrix.M23 = VecCos(z0, y1);
             matrix.M33 = -VecCos(z0, z1); //-
 
-               
-
+            #region Из старого проекта
             /* OLD
               matrix.M11 = VecCos(x0, x1);
             matrix.M22 = -VecCos(y0, y1); //-
@@ -158,20 +155,16 @@ namespace StructuralModelEngine
 
             matrix.M23 = -VecCos(y0, z1); //-
              */
+            #endregion
 
             return matrix;
         }
 
+        //Векторы д/б нормализованы
         static double VecCos(Vector3D v1, Vector3D v2)
         {
             return Vector3D.DotProduct(v1, v2);
         }
-        /*
-         
-         public static double VecCos(double[] v1, double[] v2)
-        {
-            double res = ScalVecMult(v1, v2) / (VecLength(v1) * VecLength(v2));
-            return res;
-        }*/
+        
     }
 }
