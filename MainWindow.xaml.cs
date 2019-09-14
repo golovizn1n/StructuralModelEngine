@@ -32,8 +32,10 @@ namespace StructuralModelEngine
 
             DebugMsg("Program started.");
 
-            TextAnalyzer textAnalyzer = new TextAnalyzer(this);
-            textAnalyzer.Start();
+           TextAnalyzer textAnalyzer = new TextAnalyzer(this);
+           textAnalyzer.Start();
+
+            Add3DLabel(new Vector3D(5.0, 5.0, 0.0), "NEW LABEL");
         } 
 
         public StructuralModel structuralModel = new StructuralModel();
@@ -102,6 +104,84 @@ namespace StructuralModelEngine
                t.Transform = tg;
                 modelVisual3D.Children.Add(t);
             });
+        }
+
+        public void Add3DLabel(Vector3D position, string text)
+        {
+            //Не уверен, что именно все надо, но по другому не работает... :(
+            this.Dispatcher.Invoke(() => {
+                Viewport2DVisual3D viewport2DVisual3D = new Viewport2DVisual3D();
+
+            var geometry3D = new MeshGeometry3D();
+            viewport2DVisual3D.Geometry = geometry3D;
+
+            geometry3D.Positions.Add(new Point3D(0.0, 0.0, 0.0));
+            geometry3D.Positions.Add(new Point3D(1.0, 0.0, 0.0));
+            geometry3D.Positions.Add(new Point3D(1.0, 5.0, 0.0));
+            geometry3D.Positions.Add(new Point3D(0.0, 5.0, 0.0));
+
+            geometry3D.TriangleIndices.Add(0);
+            geometry3D.TriangleIndices.Add(1);
+            geometry3D.TriangleIndices.Add(2);
+            geometry3D.TriangleIndices.Add(2);
+            geometry3D.TriangleIndices.Add(3);
+            geometry3D.TriangleIndices.Add(0);
+
+            geometry3D.TextureCoordinates.Add(new Point(0.0, 0.0));
+            geometry3D.TextureCoordinates.Add(new Point(0.0, 1.0));
+            geometry3D.TextureCoordinates.Add(new Point(1.0, 1.0));
+            geometry3D.TextureCoordinates.Add(new Point(1.0, 0.0));
+
+            var m = new DiffuseMaterial(new SolidColorBrush(Colors.Blue));
+            Viewport2DVisual3D.SetIsVisualHostMaterial(m, true);
+
+            viewport2DVisual3D.Material = m;
+            TextBox tb = new TextBox();
+            tb.Text = text; 
+
+            viewport2DVisual3D.Visual = tb;
+            
+
+            viewport2DVisual3D.Transform = new TranslateTransform3D(position.X, position.Y, position.Z);
+
+             modelVisual3D.Children.Add(viewport2DVisual3D); });
+            
+            
+            
+            /*
+            
+                   < Viewport2DVisual3D.Visual >
+   
+                       < Border BorderBrush = "Black" BorderThickness = "1" >
+      
+                              < StackPanel >
+      
+                                  < Button Content = "Hello World" />
+       
+                                   < TextBox > Введи текст </ TextBox >
+          
+                                  </ StackPanel >
+          
+                              </ Border >
+          
+                          </ Viewport2DVisual3D.Visual >
+          
+
+                          < Viewport2DVisual3D.Transform >
+          
+                              < RotateTransform3D >
+          
+                                  < RotateTransform3D.Rotation >
+          
+                                      < AxisAngleRotation3D x: Name = "rotate" Axis = "0 0 1" Angle = "00" />
+                
+                                        </ RotateTransform3D.Rotation >
+                
+                                    </ RotateTransform3D >
+                
+                                </ Viewport2DVisual3D.Transform >
+                
+                            </ Viewport2DVisual3D >*/
         }
 
         //Выводим некторое сообщение в лог

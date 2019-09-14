@@ -81,8 +81,13 @@ namespace StructuralModelEngine
 
             foreach (var n in mainWindow.structuralModel.nodes)
             {
+                Vector3D pos = new Vector3D(n.x, n.y, n.z);
+
                 mainWindow.AddSphere(n.x, n.y, n.z, 0.2);
-                mainWindow.AddCs(new Vector3D(n.x, n.y, n.z), new Vector3D(n.xt, n.yt, n.zt));                
+                mainWindow.AddCs(pos, new Vector3D(n.xt, n.yt, n.zt));
+
+                string s = pos.X.ToString("0.0") +" "+ pos.Y.ToString("0.0") +" "+ pos.Z.ToString("0.0") ;
+                mainWindow.Add3DLabel(pos, s);
             }
 
             #endregion
