@@ -34,9 +34,10 @@ namespace StructuralModelEngine
 
            TextAnalyzer textAnalyzer = new TextAnalyzer(this);
            textAnalyzer.Start();
+            
+        }
 
-        } 
-
+        
         public StructuralModel structuralModel = new StructuralModel();
        
         public void AddSphere(double x, double y, double z, double r)
@@ -69,14 +70,6 @@ namespace StructuralModelEngine
             this.Dispatcher.Invoke(() =>
             {
                 var t = new CoordinateSystemVisual3D();
-
-               // Transform3DGroup tg = new Transform3DGroup();
-                
-                //tg.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1.0, 0.0, 0.0), 45.0)));
-               // tg.Children.Add(new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(0.0, 1.0, 0.0), 45.0)));
-               // tg.Children.Add(new TranslateTransform3D(x, y, z));
-
-                //t.Transform = tg;
                 modelVisual3D.Children.Add(t);
             });
         }
@@ -101,7 +94,7 @@ namespace StructuralModelEngine
                 tg.Children.Add(new TranslateTransform3D(position.X, position.Y, position.Z));
 
                t.Transform = tg;
-                modelVisual3D.Children.Add(t);
+               modelVisual3D.Children.Add(t);
             });
         }
 
@@ -115,14 +108,20 @@ namespace StructuralModelEngine
             viewport2DVisual3D.Geometry = geometry3D;
 
             Vector3D lookVector = position - (Vector3D)hxViewport3D.Camera.Position;
-
                 
-            var mat = BuildNormalMatrix(lookVector);
+            var mlt = lookVector.Length * 0.05;
+            var mlt2 = (text.Length * 0.08333333333333);
+
+            var s = hxViewport3D.Camera.GetInfo();
+            
+            this.Dispatcher.Invoke(() => { DebugClear(); DebugMsg(s); });
+                
+            var mat = BuildCosinesMatrix(lookVector);
 
             var p1 = new Point3D(0.0, 0.0, 0.0);
-            var p2 = new Point3D(0.0, -5.0, 0.0);
-            var p3 = new Point3D(0.0, -5.0, 1.0);
-            var p4 = new Point3D(0.0, 0.0, 1.0);
+            var p2 = new Point3D(0.0, -4.0 * mlt * mlt2, 0.0);
+            var p3 = new Point3D(0.0, -4.0 * mlt * mlt2, 1.0 * mlt);
+            var p4 = new Point3D(0.0, 0.0, 1.0 * mlt);
            
             geometry3D.Positions.Add(p1);
             geometry3D.Positions.Add(p2);
@@ -142,15 +141,12 @@ namespace StructuralModelEngine
             geometry3D.TextureCoordinates.Add(new Point(1.0, 0.0));
             geometry3D.TextureCoordinates.Add(new Point(0.0, 0.0));
 
-            var m = new DiffuseMaterial(new SolidColorBrush(Colors.Blue));
+            var m = new DiffuseMaterial(new SolidColorBrush(Colors.Black));
             Viewport2DVisual3D.SetIsVisualHostMaterial(m, true);
 
             viewport2DVisual3D.Material = m;
-            TextBox tb = new TextBox
-            {
-                Text = text
-            };
 
+                Label tb = new Label { Content = text, FontFamily = new FontFamily("consolas") };
             viewport2DVisual3D.Visual = tb;
 
                 var tg = new Transform3DGroup();
@@ -161,9 +157,9 @@ namespace StructuralModelEngine
                 tg.Children.Add(tm);
                 tg.Children.Add(trans);
             viewport2DVisual3D.Transform = tg;
-                
-            
-            modelVisual3D.Children.Add(viewport2DVisual3D); });
+
+
+             modelVisual3D.Children.Add(viewport2DVisual3D); });
                         
             /*
             
@@ -199,30 +195,7 @@ namespace StructuralModelEngine
                                 </ Viewport2DVisual3D.Transform >
                 
                             </ Viewport2DVisual3D >*/
-        }
-
-        //Выводим некторое сообщение в лог
-        void DebugMsg(string msg)
-        {
-            TextRange doc = new TextRange(debugOutput.Document.ContentStart, debugOutput.Document.ContentEnd);
-
-            Dispatcher.Invoke(()=> 
-            {
-                doc.Text += msg + Environment.NewLine;
-            });
-            
-        }
-
-        void DebugClear()
-        {
-            TextRange doc = new TextRange(debugOutput.Document.ContentStart, debugOutput.Document.ContentEnd);
-
-            Dispatcher.Invoke(() =>
-            {
-                doc.Text = "";
-            });
-
-        }
+        }        
 
         public Matrix3D BuildCosinesMatrix(Vector3D x1, Vector3D y1, Vector3D z1)
         {
@@ -286,29 +259,33 @@ namespace StructuralModelEngine
             return matrix;
         }
 
-        public Matrix3D BuildNormalMatrix(Vector3D v)
-        {
-            v.Normalize();
-
-            Vector3D x = v;
-            Vector3D z = new Vector3D(0.0, 0.0, 1.0);
-            Vector3D y = Vector3D.CrossProduct(x, z);
-            z = Vector3D.CrossProduct(x, y);
-
-            x.Normalize();
-            y.Normalize();
-            z.Normalize();
-
-            Matrix3D matrix = BuildCosinesMatrix(x, y, z);
-
-            return matrix;
-        }
-
         //Векторы д/б нормализованы
-        static double VecCos(Vector3D v1, Vector3D v2)
+        private static double VecCos(Vector3D v1, Vector3D v2)
         {
             return Vector3D.DotProduct(v1, v2);
         }
-        
+
+        //Выводим некторое сообщение в лог
+        private void DebugMsg(string msg)
+        {
+            TextRange doc = new TextRange(debugOutput.Document.ContentStart, debugOutput.Document.ContentEnd);
+
+            Dispatcher.Invoke(() =>
+            {
+                doc.Text += msg + Environment.NewLine;
+            });
+
+        }
+
+        private void DebugClear()
+        {
+            TextRange doc = new TextRange(debugOutput.Document.ContentStart, debugOutput.Document.ContentEnd);
+
+            Dispatcher.Invoke(() =>
+            {
+                doc.Text = "";
+            });
+
+        }
     }
 }

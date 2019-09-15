@@ -41,7 +41,7 @@ namespace StructuralModelEngine
         {
             #region Распознаем текст, добавляем узлы
             TextRange doc = new TextRange(mainWindow.textEdit.Document.ContentStart, mainWindow.textEdit.Document.ContentEnd);
-
+                        
             mainWindow.structuralModel.nodes.Clear();
             mainWindow.Dispatcher.Invoke(() => { mainWindow.modelVisual3D.Children.Clear(); });
 
@@ -86,10 +86,11 @@ namespace StructuralModelEngine
                 mainWindow.AddSphere(n.x, n.y, n.z, 0.2);
                 mainWindow.AddCs(pos, new Vector3D(n.xt, n.yt, n.zt));
 
-                string s = pos.X.ToString("0.0") +" "+ pos.Y.ToString("0.0") +" "+ pos.Z.ToString("0.0") ;
-                mainWindow.Add3DLabel(pos, s);
+                
+                mainWindow.Add3DLabel(pos, pos.ToString());
             }
 
+            
             #endregion
         }
         
