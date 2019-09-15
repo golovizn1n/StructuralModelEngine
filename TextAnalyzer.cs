@@ -61,13 +61,16 @@ namespace StructuralModelEngine
                             var z = Convert.ToSingle(words[3]);
 
                             var n = mainWindow.structuralModel.AddNode(x, y, z);
+                            n.xt = n.x + 1.0;
+                            n.yt = n.y;
+                            n.zt = n.z;
 
                             if (words[4] == "cs")
                             {
                                 n.xt = Convert.ToSingle(words[5]);
                                 n.yt = Convert.ToSingle(words[6]);
                                 n.zt = Convert.ToSingle(words[7]);
-                            }
+                            }                            
                         }
                         catch (Exception)
                         {
@@ -84,9 +87,9 @@ namespace StructuralModelEngine
                 Vector3D pos = new Vector3D(n.x, n.y, n.z);
 
                 mainWindow.AddSphere(n.x, n.y, n.z, 0.2);
+                
                 mainWindow.AddCs(pos, new Vector3D(n.xt, n.yt, n.zt));
 
-                
                 mainWindow.Add3DLabel(pos, pos.ToString());
             }
 
