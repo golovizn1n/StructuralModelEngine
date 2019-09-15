@@ -10,14 +10,17 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>            
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-                <HelixToolkit:HelixViewport3D 
+        
+        <HelixToolkit:HelixViewport3D x:Name="hxViewport3D"
             Grid.ColumnSpan="2" 
+             Grid.RowSpan="2" 
             ZoomExtentsWhenLoaded="True" 
             ShowFrameRate="True"
             CameraRotationMode="Turntable"
@@ -52,7 +55,7 @@
             <HelixToolkit:GridLinesVisual3D Width="8" Length="8" MinorDistance="1" MajorDistance="1" Thickness="0.01"/>
         </HelixToolkit:HelixViewport3D>
 
-        <RichTextBox Grid.Row="1" Name ="textEdit">
+        <RichTextBox Grid.Row="2" Name ="textEdit">
             <FlowDocument LineHeight="1">
                 <Paragraph>
                     node 1 2 3
@@ -63,8 +66,7 @@
                 
             </FlowDocument>
         </RichTextBox>
-        <RichTextBox Grid.Column="2" 
-                     Name ="debugOutput"
+        <RichTextBox Grid.Column="2" Name ="debugOutput"
                      Grid.Row="2">
             <FlowDocument LineHeight="1">                
                 <Paragraph>

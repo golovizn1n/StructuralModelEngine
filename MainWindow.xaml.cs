@@ -35,7 +35,6 @@ namespace StructuralModelEngine
            TextAnalyzer textAnalyzer = new TextAnalyzer(this);
            textAnalyzer.Start();
 
-            Add3DLabel(new Vector3D(5.0, 5.0, 0.0), "NEW LABEL");
         } 
 
         public StructuralModel structuralModel = new StructuralModel();
@@ -108,17 +107,27 @@ namespace StructuralModelEngine
 
         public void Add3DLabel(Vector3D position, string text)
         {
-            //Не уверен, что именно все надо, но по другому не работает... :(
+            
             this.Dispatcher.Invoke(() => {
-                Viewport2DVisual3D viewport2DVisual3D = new Viewport2DVisual3D();
+            var viewport2DVisual3D = new Viewport2DVisual3D();
 
             var geometry3D = new MeshGeometry3D();
             viewport2DVisual3D.Geometry = geometry3D;
 
-            geometry3D.Positions.Add(new Point3D(0.0, 0.0, 0.0));
-            geometry3D.Positions.Add(new Point3D(1.0, 0.0, 0.0));
-            geometry3D.Positions.Add(new Point3D(1.0, 5.0, 0.0));
-            geometry3D.Positions.Add(new Point3D(0.0, 5.0, 0.0));
+            Vector3D lookVector = position - (Vector3D)hxViewport3D.Camera.Position;
+
+                
+            var mat = BuildNormalMatrix(lookVector);
+
+            var p1 = new Point3D(0.0, 0.0, 0.0);
+            var p2 = new Point3D(0.0, -5.0, 0.0);
+            var p3 = new Point3D(0.0, -5.0, 1.0);
+            var p4 = new Point3D(0.0, 0.0, 1.0);
+           
+            geometry3D.Positions.Add(p1);
+            geometry3D.Positions.Add(p2);
+            geometry3D.Positions.Add(p3);
+            geometry3D.Positions.Add(p4);
 
             geometry3D.TriangleIndices.Add(0);
             geometry3D.TriangleIndices.Add(1);
@@ -127,27 +136,35 @@ namespace StructuralModelEngine
             geometry3D.TriangleIndices.Add(3);
             geometry3D.TriangleIndices.Add(0);
 
-            geometry3D.TextureCoordinates.Add(new Point(0.0, 0.0));
+            
             geometry3D.TextureCoordinates.Add(new Point(0.0, 1.0));
             geometry3D.TextureCoordinates.Add(new Point(1.0, 1.0));
             geometry3D.TextureCoordinates.Add(new Point(1.0, 0.0));
+            geometry3D.TextureCoordinates.Add(new Point(0.0, 0.0));
 
             var m = new DiffuseMaterial(new SolidColorBrush(Colors.Blue));
             Viewport2DVisual3D.SetIsVisualHostMaterial(m, true);
 
             viewport2DVisual3D.Material = m;
-            TextBox tb = new TextBox();
-            tb.Text = text; 
+            TextBox tb = new TextBox
+            {
+                Text = text
+            };
 
             viewport2DVisual3D.Visual = tb;
-            
 
-            viewport2DVisual3D.Transform = new TranslateTransform3D(position.X, position.Y, position.Z);
+                var tg = new Transform3DGroup();
+                var tm = new MatrixTransform3D(mat);
 
-             modelVisual3D.Children.Add(viewport2DVisual3D); });
+            var trans = new TranslateTransform3D(position.X, position.Y, position.Z);
+
+                tg.Children.Add(tm);
+                tg.Children.Add(trans);
+            viewport2DVisual3D.Transform = tg;
+                
             
-            
-            
+            modelVisual3D.Children.Add(viewport2DVisual3D); });
+                        
             /*
             
                    < Viewport2DVisual3D.Visual >
@@ -196,6 +213,17 @@ namespace StructuralModelEngine
             
         }
 
+        void DebugClear()
+        {
+            TextRange doc = new TextRange(debugOutput.Document.ContentStart, debugOutput.Document.ContentEnd);
+
+            Dispatcher.Invoke(() =>
+            {
+                doc.Text = "";
+            });
+
+        }
+
         public Matrix3D BuildCosinesMatrix(Vector3D x1, Vector3D y1, Vector3D z1)
         {
             Matrix3D matrix = new Matrix3D();
@@ -236,6 +264,42 @@ namespace StructuralModelEngine
             matrix.M23 = -VecCos(y0, z1); //-
              */
             #endregion
+
+            return matrix;
+        }
+
+        public Matrix3D BuildCosinesMatrix(Vector3D v)
+        {
+            v.Normalize();
+
+            Vector3D x = v;
+            Vector3D z = new Vector3D(0.0, 0.0, 1.0);
+            Vector3D y = Vector3D.CrossProduct(x, z);
+            z = Vector3D.CrossProduct(x, y);
+
+            x.Normalize();
+            y.Normalize();
+            z.Normalize();
+
+            Matrix3D matrix = BuildCosinesMatrix(x, y, z);
+
+            return matrix;
+        }
+
+        public Matrix3D BuildNormalMatrix(Vector3D v)
+        {
+            v.Normalize();
+
+            Vector3D x = v;
+            Vector3D z = new Vector3D(0.0, 0.0, 1.0);
+            Vector3D y = Vector3D.CrossProduct(x, z);
+            z = Vector3D.CrossProduct(x, y);
+
+            x.Normalize();
+            y.Normalize();
+            z.Normalize();
+
+            Matrix3D matrix = BuildCosinesMatrix(x, y, z);
 
             return matrix;
         }
